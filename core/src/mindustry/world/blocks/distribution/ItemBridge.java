@@ -38,6 +38,7 @@ public class ItemBridge extends Block{
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
     public float bridgeWidth = 6.5f;
+    /** If true, this bridge will not accept items or liquids when disabled. */
     public boolean noAcceptDisabled = false;
 
     //for autolink
@@ -58,7 +59,7 @@ public class ItemBridge extends Block{
         allowDiagonal = false;
         copyConfig = false;
         ignoreResizeConfig = true;
-        swapConfigInventory = true;
+        diagonalConfigInventory = true;
         priority = TargetPriority.transport;
         delayLandingConfig = true;
 
@@ -156,7 +157,7 @@ public class ItemBridge extends Block{
             if(!(tile.block().hasItems && other.block().hasItems) && !(tile.block().hasLiquids && other.block().hasLiquids)) return false;
         }
 
-        return ((linkSameType ? other.block() == tile.block() && tile.block() == this : (other.block() instanceof ItemBridge && tile.block() instanceof ItemBridge)) 
+        return ((linkSameType ? other.block() == tile.block() && tile.block() == this : (other.block() instanceof ItemBridge && tile.block() instanceof ItemBridge))
             || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
             && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
@@ -434,7 +435,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link));
+            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link)) && (!noAcceptDisabled || enabled);
         }
 
         @Override

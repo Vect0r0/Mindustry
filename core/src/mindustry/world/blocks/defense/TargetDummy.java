@@ -88,7 +88,12 @@ public class TargetDummy extends Block{
         public int hitsDisplay;
         public boolean boosting;
         public float unitArmor;
-        public Team unitTeam;
+        public Team unitTeam = Team.derelict;
+
+        @Override
+        public void created(){
+            if(unitTeam == Team.derelict) unitTeam = team;
+        }
 
         @Override
         public void updateTile(){
@@ -104,7 +109,7 @@ public class TargetDummy extends Block{
                 }
             }
 
-            if(unitTeam == null) unitTeam = team;
+            if(unitTeam == Team.derelict) unitTeam = team;
 
             if(unit == null){
                 if(!net.client()){
@@ -126,7 +131,7 @@ public class TargetDummy extends Block{
                 unit.hitSize = dummySize;
 
                 //similar to impulseNet but does not factor in mass
-                Tmp.v1.set(this).sub(unit).limit(dst(unit) * pullScale * Time.delta);
+                Tmp.v1.set(this).sub(unit).limit(dst(unit) * pullScale);
                 unit.vel.add(Tmp.v1);
 
                 //manually move units to simulate velocity for remote players
@@ -233,7 +238,7 @@ public class TargetDummy extends Block{
                 t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configureFloat(0, Mathf.num(b))).colspan(3).row();
                 t.check(Core.bundle.get("stat.flying"), boosting, b -> configureFloat(1, Mathf.num(b))).colspan(3).row();
                 t.add(Core.bundle.get("stat.armor"));
-                t.field("" + unitArmor, TextFieldFilter.floatsOnly, s -> configureFloat(2, Strings.parseFloat(s))).width(200f).padLeft(8f).colspan(2).row();
+                t.field("" + (int)unitArmor, TextFieldFilter.digitsOnly, s -> configureFloat(2, Strings.parseInt(s))).width(200f).padLeft(8f).colspan(2).row();
                 t.add(Core.bundle.get("stat.resettime"));
                 t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).padLeft(8f).growX();
                 t.add(StatUnit.seconds.localized()).padLeft(8).row();
